@@ -29,13 +29,42 @@ const User = connection.define('User', {
     primaryKey: true,
     defaultValue: Sequelize.UUIDV4
   },
-  name: Sequelize.STRING,
-  bio: Sequelize.TEXT,
+  name: {
+    type: Sequelize.STRING,
+    validate: {
+      len: [3]
+    }
+  },
+  bio: {
+    type: Sequelize.TEXT,
+    validate: {
+      contains: {
+        args: ['foo'],
+        msg: 'ERROR: Field must contain foo'
+      }
+    }
+  },
 }, 
 {
   timestamps: false
 }
 );
+
+// routes
+app.get ('/', (req, res) => {
+  User.create({
+    name: 'Sa',
+    bio: 'New bio entry for Sally'
+  })
+  .then(user => {
+    res.json(user);
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(404).send(error);
+  })
+})
+
 
 // connect and sync the database then log success
 // logging option shows the sql in the console
@@ -46,10 +75,10 @@ connection
   force: true
 })
 .then(() => {
-  User.create({
-    name: 'Sally',
-    bio: 'New bio entry for Sally'
-  })
+  // User.create({
+  //   name: 'Sally',
+  //   bio: 'New bio entry for Sally'
+  // })
 })
 .then(() => {
   console.log('Connection to db successfull');
