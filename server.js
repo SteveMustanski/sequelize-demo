@@ -90,6 +90,8 @@ app.get('/singlepost', (req, res) => {
     include: [{
       model: Comment, as: 'All_Comments',
       attributes: ['the_comment']
+    }, {
+      model: User, as: 'UserRef'
     }]
   })
     .then(post => {
