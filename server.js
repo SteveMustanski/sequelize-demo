@@ -52,7 +52,7 @@ const Post = connection.define('Post', {
   content: Sequelize.TEXT
 });
 
-Post.belongsTo(User, {foreignKey: 'userId'});  // puts a foreignKey userid in the post table
+Post.belongsTo(User, { as: 'UserRef', foreignKey: 'userId' });  // puts a foreignKey userid in the post table
 
 
 // routes
@@ -72,7 +72,9 @@ app.get('/allusers', (req, res) => {
 // get all posts
 app.get('/allposts', (req, res) => {
   Post.findAll({
-    include: [User]
+    include: [{
+      model: User, as: 'UserRef'
+    }]
   })
     .then(post => {
       res.json(post);
@@ -96,20 +98,20 @@ connection
   // this is left in for demo purposes
   .then(() => {
     User.bulkCreate(_USERS)
-    .then(users => {
-      console.log('Successfully added users');
+      .then(users => {
+        console.log('Successfully added users');
+      })
+      .catch(error => {
+        console.log(error);
+      })
+  })
+  .then(() => {
+    Post.create({
+      userId: 1,
+      title: 'First Post',
+      content: 'post content 1'
     })
-    .catch(error => {
-      console.log(error);
-    })
-   })
-  // .then(() => {
-  //   Post.create({
-  //     UserId: 1,
-  //     title: 'First Post',
-  //     content: 'post content 1'
-  //   })
-  // })
+  })
   .then(() => {
     console.log('Connection to db successfull');
   });
