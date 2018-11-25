@@ -52,7 +52,7 @@ const Post = connection.define('Post', {
   content: Sequelize.TEXT
 });
 
-Post.belongsTo(User);  // puts a foreignKey userid in the post table
+Post.belongsTo(User, {foreignKey: 'userId'});  // puts a foreignKey userid in the post table
 
 
 // routes
@@ -90,26 +90,26 @@ app.get('/allposts', (req, res) => {
 // setting force to true will drop the tables and recreate on connection
 connection
   .sync({
-    logging: console.log,
+    force: true,
   })
-  // commented out since the users have been created
+  // commented out if the users have been created
   // this is left in for demo purposes
+  .then(() => {
+    User.bulkCreate(_USERS)
+    .then(users => {
+      console.log('Successfully added users');
+    })
+    .catch(error => {
+      console.log(error);
+    })
+   })
   // .then(() => {
-  //   User.bulkCreate(_USERS)
-  //   .then(users => {
-  //     console.log('Successfully added users');
-  //   })
-  //   .catch(error => {
-  //     console.log(error);
+  //   Post.create({
+  //     UserId: 1,
+  //     title: 'First Post',
+  //     content: 'post content 1'
   //   })
   // })
-  .then(() => {
-    Post.create({
-      UserId: 1,
-      title: 'First Post',
-      content: 'post content 1'
-    })
-  })
   .then(() => {
     console.log('Connection to db successfull');
   });
