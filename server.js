@@ -16,9 +16,7 @@ const connection = new Sequelize({
   database: 'testDB',
   host: 'localhost',
   dialect: 'mysql',
-  define: {
-    freezeTableName: true,
-  }
+  operatorsAliases: false
 });
 
 // models
@@ -41,18 +39,19 @@ const User = connection.define('User', {
 }
 );
 
+// define the model for the comment
+const Comment = connection.define('Comment', {
+  the_comment: Sequelize.STRING
+});
+
 // define the model for the post table
 const Post = connection.define('Post', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.UUID,
-    defaultValue: Sequelize.UUIDV4
-  },
   title: Sequelize.STRING,
   content: Sequelize.TEXT
 });
 
 Post.belongsTo(User, { as: 'UserRef', foreignKey: 'userId' });  // puts a foreignKey userid in the post table
+Post.hasMany(Comment, {as: 'All_Comments'}); // a foreignKey of PostId will be put in the comment table
 
 
 // routes
@@ -74,6 +73,23 @@ app.get('/allposts', (req, res) => {
   Post.findAll({
     include: [{
       model: User, as: 'UserRef'
+    }]
+  })
+    .then(post => {
+      res.json(post);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
+})
+
+// get a single post
+app.get('/singlepost', (req, res) => {
+  Post.findById( '1', {
+    include: [{
+      model: Comment, as: 'All_Comments',
+      attributes: ['the_comment']
     }]
   })
     .then(post => {
@@ -110,6 +126,32 @@ connection
       userId: 1,
       title: 'First Post',
       content: 'post content 1'
+    })
+  })
+  .then(() => {
+    Post.create({
+      userId: 1,
+      title: 'Second post',
+      content: 'post content 2'
+    })
+  })
+  .then(() => {
+    Post.create({
+      userId: 2,
+      title: 'First Post',
+      content: 'post content 1'
+    })
+  })
+  .then(() => {
+    Comment.create({
+      PostId: 1,
+      the_comment: 'First comment'
+    })
+  })
+  .then(() => {
+    Comment.create({
+      PostId: 1,
+      the_comment: 'Second comment'
     })
   })
   .then(() => {
