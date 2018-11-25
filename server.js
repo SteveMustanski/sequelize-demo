@@ -1,5 +1,6 @@
 const express = require('express');
 const Sequelize = require('sequelize');
+const _USERS = require('./users.json');
 
 const app = express();
 const port = 8080;
@@ -20,36 +21,19 @@ const connection = new Sequelize({
 });
 
 // define the model for the user table
-// uuid is a universal unique id, setting default value keeps it from being null
-// the 3rd argument sets properties on the modle
-// timestamps false set no created or updated fields are created
+
 const User = connection.define('User', {
-  uuid: {
-    type: Sequelize.UUID,
-    primaryKey: true,
-    defaultValue: Sequelize.UUIDV4
+  name: Sequelize.STRING,
+  email: {
+    type: Sequelize.STRING,
+    validate: {
+      isEmail: true
+    }
   },
-  first: Sequelize.STRING,
-  last: Sequelize.STRING,
-  full_name: Sequelize.STRING,
-  bio: {
-    type: Sequelize.TEXT,
-  },
-},
-{
-  hooks: {
-    beforeValidate: ()=> {
-      console.log('before validate');
-    },
-    afterValidate: ()=> {
-      console.log('after validate');
-    },
-    beforeCreate: (user)=> {
-      user.full_name = `${user.first} ${user.last}`;
-      console.log('before create');
-    },
-    afterCreate: ()=> {
-      console.log('after create');
+  password: {
+    type: Sequelize.STRING,
+    validate: {
+      isAlphanumeric: true
     }
   }
 }
@@ -77,13 +61,14 @@ app.get ('/', (req, res) => {
 connection
 .sync({
   logging: console.log,
-  force: true
 })
 .then(() => {
-  User.create({
-    first: 'Sally',
-    last: 'Smith',
-    bio: 'New bio entry for Sally'
+  User.bulkCreate(_USERS)
+  .then(users => {
+    console.log('Successfully added users');
+  })
+  .catch(error => {
+    console.log(error);
   })
 })
 .then(() => {
