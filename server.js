@@ -40,7 +40,20 @@ const User = connection.define('User', {
 }
 );
 
+// find by id
+app.get('/findone', (req, res) => {
+  User.findById('55')
+    .then(user => {
+      res.json(user);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
+})
+
 // get all users
+// find all users were name like O*
 app.get('/findall', (req, res) => {
   User.findAll({
     where: {
@@ -49,27 +62,27 @@ app.get('/findall', (req, res) => {
       }
     }
   })
-  .then(user => {
-    res.json(user);
-  })
-  .catch(error => {
-    console.log(error);
-    res.status(404).send(error);
-  })
+    .then(user => {
+      res.json(user);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
 })
 
 // routes
 // psudo code
-app.post ('/post', (req, res) => {
+app.post('/post', (req, res) => {
   const newUser = req.body.user;
   User.create(newUser)
-  .then(user => {
-    res.json(user);
-  })
-  .catch(error => {
-    console.log(error);
-    res.status(404).send(error);
-  })
+    .then(user => {
+      res.json(user);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
 })
 
 
@@ -77,23 +90,23 @@ app.post ('/post', (req, res) => {
 // logging option shows the sql in the console
 // setting force to true will drop the tables and recreate on connection
 connection
-.sync({
-  logging: console.log,
-})
-// commented out since the users have been created
-// this is left in for demo purposes
-// .then(() => {
-//   User.bulkCreate(_USERS)
-//   .then(users => {
-//     console.log('Successfully added users');
-//   })
-//   .catch(error => {
-//     console.log(error);
-//   })
-// })
-.then(() => {
-  console.log('Connection to db successfull');
-});
+  .sync({
+    logging: console.log,
+  })
+  // commented out since the users have been created
+  // this is left in for demo purposes
+  // .then(() => {
+  //   User.bulkCreate(_USERS)
+  //   .then(users => {
+  //     console.log('Successfully added users');
+  //   })
+  //   .catch(error => {
+  //     console.log(error);
+  //   })
+  // })
+  .then(() => {
+    console.log('Connection to db successfull');
+  });
 
 // start listening on port
 app.listen(port, () => {
