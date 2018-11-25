@@ -1,6 +1,7 @@
 const express = require('express');
 const Sequelize = require('sequelize');
 const _USERS = require('./users.json');
+const Op = Sequelize.Op;
 
 const app = express();
 const port = 8080;
@@ -39,12 +40,29 @@ const User = connection.define('User', {
 }
 );
 
-// routes
-app.get ('/', (req, res) => {
-  User.create({
-    name: 'Sally',
-    bio: 'New bio entry for Sally'
+// get all users
+app.get('/findall', (req, res) => {
+  User.findAll({
+    where: {
+      name: {
+        [Op.like]: 'O%'
+      }
+    }
   })
+  .then(user => {
+    res.json(user);
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(404).send(error);
+  })
+})
+
+// routes
+// psudo code
+app.post ('/post', (req, res) => {
+  const newUser = req.body.user;
+  User.create(newUser)
   .then(user => {
     res.json(user);
   })
@@ -62,15 +80,17 @@ connection
 .sync({
   logging: console.log,
 })
-.then(() => {
-  User.bulkCreate(_USERS)
-  .then(users => {
-    console.log('Successfully added users');
-  })
-  .catch(error => {
-    console.log(error);
-  })
-})
+// commented out since the users have been created
+// this is left in for demo purposes
+// .then(() => {
+//   User.bulkCreate(_USERS)
+//   .then(users => {
+//     console.log('Successfully added users');
+//   })
+//   .catch(error => {
+//     console.log(error);
+//   })
+// })
 .then(() => {
   console.log('Connection to db successfull');
 });
