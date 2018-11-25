@@ -71,6 +71,24 @@ app.get('/findall', (req, res) => {
     })
 })
 
+// update by id
+// sequelize does not return the updated user
+//  but only the number of rows updated
+app.put('/update', (req, res) => {
+  User.update({
+    name: 'Michael Keaton',
+    password: 'password'
+  },
+  {where: {id: 55}})
+    .then(rows => {
+      res.json(rows);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
+})
+
 // routes
 // psudo code
 app.post('/post', (req, res) => {
