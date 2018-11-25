@@ -21,8 +21,9 @@ const connection = new Sequelize({
   }
 });
 
-// define the model for the user table
+// models
 
+// define the model for the user table
 const User = connection.define('User', {
   name: Sequelize.STRING,
   email: {
@@ -40,10 +41,24 @@ const User = connection.define('User', {
 }
 );
 
+// define the model for the post table
+const Post = connection.define('Post', {
+  id: {
+    primaryKey: true,
+    type: Sequelize.UUID,
+    defaultValue: Sequelize.UUIDV4
+  },
+  title: Sequelize.STRING,
+  content: Sequelize.TEXT
+});
+
+Post.belongsTo(User);  // puts a foreignKey userid in the post table
+
+
 // routes
 
 // get all users
-app.get('/findall', (req, res) => {
+app.get('/allusers', (req, res) => {
   User.findAll()
     .then(user => {
       res.json(user);
@@ -53,6 +68,21 @@ app.get('/findall', (req, res) => {
       res.status(404).send(error);
     })
 })
+
+// get all posts
+app.get('/allposts', (req, res) => {
+  Post.findAll({
+    include: [User]
+  })
+    .then(post => {
+      res.json(post);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
+})
+
 
 
 // connect and sync the database then log success
@@ -73,6 +103,13 @@ connection
   //     console.log(error);
   //   })
   // })
+  .then(() => {
+    Post.create({
+      UserId: 1,
+      title: 'First Post',
+      content: 'post content 1'
+    })
+  })
   .then(() => {
     console.log('Connection to db successfull');
   });
