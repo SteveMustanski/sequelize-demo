@@ -40,6 +40,7 @@ const User = connection.define('User', {
 }
 );
 
+// routes
 // find by id
 app.get('/findone', (req, res) => {
   User.findById('55')
@@ -79,7 +80,7 @@ app.put('/update', (req, res) => {
     name: 'Michael Keaton',
     password: 'password'
   },
-  {where: {id: 55}})
+    { where: { id: 55 } })
     .then(rows => {
       res.json(rows);
     })
@@ -89,7 +90,20 @@ app.put('/update', (req, res) => {
     })
 })
 
-// routes
+// find by id
+app.delete('/remove', (req, res) => {
+  User.destroy({
+    where: { id: 51 }
+  })
+    .then(() => {
+      res.send('User successfully deleted');
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
+})
+
 // psudo code
 app.post('/post', (req, res) => {
   const newUser = req.body.user;
