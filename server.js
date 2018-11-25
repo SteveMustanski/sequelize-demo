@@ -41,73 +41,10 @@ const User = connection.define('User', {
 );
 
 // routes
-// find by id
-app.get('/findone', (req, res) => {
-  User.findById('55')
-    .then(user => {
-      res.json(user);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(404).send(error);
-    })
-})
 
 // get all users
-// find all users were name like O*
 app.get('/findall', (req, res) => {
-  User.findAll({
-    where: {
-      name: {
-        [Op.like]: 'O%'
-      }
-    }
-  })
-    .then(user => {
-      res.json(user);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(404).send(error);
-    })
-})
-
-// update by id
-// sequelize does not return the updated user
-//  but only the number of rows updated
-app.put('/update', (req, res) => {
-  User.update({
-    name: 'Michael Keaton',
-    password: 'password'
-  },
-    { where: { id: 55 } })
-    .then(rows => {
-      res.json(rows);
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(404).send(error);
-    })
-})
-
-// find by id
-app.delete('/remove', (req, res) => {
-  User.destroy({
-    where: { id: 51 }
-  })
-    .then(() => {
-      res.send('User successfully deleted');
-    })
-    .catch(error => {
-      console.log(error);
-      res.status(404).send(error);
-    })
-})
-
-// psudo code
-app.post('/post', (req, res) => {
-  const newUser = req.body.user;
-  User.create(newUser)
+  User.findAll()
     .then(user => {
       res.json(user);
     })
