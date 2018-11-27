@@ -56,11 +56,11 @@ const Project = connection.define('Project', {
 });
 
 Post.belongsTo(User, { as: 'UserRef', foreignKey: 'userId' });  // puts a foreignKey userid in the post table
-Post.hasMany(Comment, {as: 'All_Comments'}); // a foreignKey of PostId will be put in the comment table
+Post.hasMany(Comment, { as: 'All_Comments' }); // a foreignKey of PostId will be put in the comment table
 
 // will creat a UserProjects table with the IDs for the ProjectId and UserId
-User.belongsToMany(Project, {as: 'Tasks', through: 'UserProjects'});
-Project.belongsToMany(User, {as: 'Workers', through: 'UserProjects'});
+User.belongsToMany(Project, { as: 'Tasks', through: 'UserProjects' });
+Project.belongsToMany(User, { as: 'Workers', through: 'UserProjects' });
 
 // routes
 
@@ -94,7 +94,7 @@ app.get('/allposts', (req, res) => {
 
 // get a single post
 app.get('/singlepost', (req, res) => {
-  Post.findById( '1', {
+  Post.findById('1', {
     include: [{
       model: Comment, as: 'All_Comments',
       attributes: ['the_comment']
@@ -126,6 +126,24 @@ app.post('/addWorker', (req, res) => {
     })
 })
 
+// get a list of users and their projects
+app.get('/getUserProjects', (req, res) => {
+  User.findAll({
+    attributes: ['name'],
+    include: [{
+      model: Project, as: 'Tasks',
+      attributes: ['title']
+    }]
+  })
+    .then(output => {
+      res.json(output);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
+})
+
 
 
 // connect and sync the database then log success
@@ -139,7 +157,7 @@ connection
     Project.create({
       title: 'project 1'
     }).then((project) => {
-      project.setWorkers([4,5]);
+      project.setWorkers([4, 5]);
     })
   })
   .then(() => {
