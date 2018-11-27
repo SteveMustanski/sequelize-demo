@@ -111,6 +111,21 @@ app.get('/singlepost', (req, res) => {
     })
 })
 
+// add worker to project
+// this route is hardcoded to add user 5 to project 2
+app.post('/addWorker', (req, res) => {
+  Project.findById(2).then((project) => {
+    project.addWorkers(5);
+  })
+    .then(() => {
+      res.send('User add to project');
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
+})
+
 
 
 // connect and sync the database then log success
