@@ -50,9 +50,17 @@ const Post = connection.define('Post', {
   content: Sequelize.TEXT
 });
 
+// define the model for the project table
+const Project = connection.define('Project', {
+  title: Sequelize.STRING
+});
+
 Post.belongsTo(User, { as: 'UserRef', foreignKey: 'userId' });  // puts a foreignKey userid in the post table
 Post.hasMany(Comment, {as: 'All_Comments'}); // a foreignKey of PostId will be put in the comment table
 
+// will creat a UserProjects table with the IDs for the ProjectId and UserId
+User.belongsToMany(Project, {as: 'Tasks', through: 'UserProjects'});
+Project.belongsToMany(User, {as: 'Workers', through: 'UserProjects'});
 
 // routes
 
@@ -111,6 +119,18 @@ app.get('/singlepost', (req, res) => {
 connection
   .sync({
     force: true,
+  })
+  .then(() => {
+    Project.create({
+      title: 'project 1'
+    }).then((project) => {
+      project.setWorkers([4,5]);
+    })
+  })
+  .then(() => {
+    Project.create({
+      title: 'project2'
+    })
   })
   // commented out if the users have been created
   // this is left in for demo purposes
